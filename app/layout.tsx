@@ -22,7 +22,6 @@ export default function RootLayout({
     <html lang='en'>
       <body className={inter.variable}>
         <Theme
-          appearance='light'
           accentColor='purple'
           grayColor='sage'
           radius='large'
