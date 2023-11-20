@@ -14,6 +14,7 @@ import {
   Flex,
   Text,
 } from '@radix-ui/themes';
+import { CustomSkeleton } from './components';
 
 const links = [
   { label: 'Dashboard', href: '/' },
@@ -62,10 +63,14 @@ const NavLinks = () => {
 const AuthStatus = () => {
   const { status, data: session } = useSession();
 
-  if (status === 'loading') return null;
+  if (status === 'loading') return <CustomSkeleton width={'3rem'}/>;
 
   if (status === 'unauthenticated') {
-    return <Link href='/api/auth/signin' className='nav-link'>Login</Link>;
+    return (
+      <Link href='/api/auth/signin' className='nav-link'>
+        Login
+      </Link>
+    );
   }
 
   return (
