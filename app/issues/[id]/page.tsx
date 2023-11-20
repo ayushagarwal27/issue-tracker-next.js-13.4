@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation';
 import EditIssueButton from './EditIssueButton';
 import IssueDetails from './IssueDetails';
 import DeleteIssueButton from './DeleteIssueButton';
+import { getServerSession } from 'next-auth';
+import authOptions from '@/app/auth/authOptions';
 
 interface IssueDetailPageProps {
   params: { id: string };
@@ -17,6 +19,8 @@ const IssueDetailPage: FC<IssueDetailPageProps> = async ({
     where: { id: parseInt(id) },
   });
 
+  const session = await getServerSession(authOptions);
+
   if (!issue) {
     notFound();
   }
@@ -26,12 +30,14 @@ const IssueDetailPage: FC<IssueDetailPageProps> = async ({
       <Box className='md:col-span-4'>
         <IssueDetails issueDetail={issue} />
       </Box>
-      <Box>
-        <Flex direction='column' gap={'4'}>
-          <EditIssueButton issueId={issue.id} />
-          <DeleteIssueButton issueId={issue.id} />
-        </Flex>
-      </Box>
+      {session && (
+        <Box>
+          <Flex direction='column' gap={'4'}>
+            <EditIssueButton issueId={issue.id} />
+            <DeleteIssueButton issueId={issue.id} />
+          </Flex>
+        </Box>
+      )}
     </Grid>
   );
 };
