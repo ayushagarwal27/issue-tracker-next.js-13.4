@@ -1,5 +1,5 @@
 
-import { FC } from 'react';
+import { FC, cache } from 'react';
 import prisma from '@/prisma/client';
 import { Box, Flex, Grid } from '@radix-ui/themes';
 import { notFound } from 'next/navigation';
@@ -9,18 +9,21 @@ import DeleteIssueButton from './DeleteIssueButton';
 import { getServerSession } from 'next-auth';
 import authOptions from '@/app/auth/authOptions';
 import AssigneeSelect from './AssigneeSelect';
-import { Metadata } from 'next';
 
 interface IssueDetailPageProps {
   params: { id: string };
 }
 
+const fetchUser = cache((issueId: number) => {
+  return prisma.issue.findUnique({
+    where: { id: issueId },
+  });
+});
+
 const IssueDetailPage: FC<IssueDetailPageProps> = async ({
   params: { id },
 }) => {
-  const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(id) },
-  });
+  const issue = await fetchUser(parseInt(id));
 
   const session = await getServerSession(authOptions);
 
@@ -36,7 +39,7 @@ const IssueDetailPage: FC<IssueDetailPageProps> = async ({
       {session && (
         <Box>
           <Flex direction='column' gap={'4'}>
-            <AssigneeSelect issue={issue}/>
+            <AssigneeSelect issue={issue} />
             <EditIssueButton issueId={issue.id} />
             <DeleteIssueButton issueId={issue.id} />
           </Flex>
@@ -46,11 +49,11 @@ const IssueDetailPage: FC<IssueDetailPageProps> = async ({
   );
 };
 
-
-export async  function generateMetadata ({params:{id}}:IssueDetailPageProps) {
- const issue =  await prisma.issue.findUnique({where:{id: parseInt(id)}});
-
- return {title:issue?.title, description:'Details of issue '+issue?.id}
+export async function generateMetadata({
+  params: { id },
+}: IssueDetailPageProps) {
+  const issue = await fetchUser(parseInt(id));
+  return { title: issue?.title, description: 'Details of issue ' + issue?.id };
 };
 
 export default IssueDetailPage;
