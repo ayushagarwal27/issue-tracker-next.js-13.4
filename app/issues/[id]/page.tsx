@@ -9,6 +9,7 @@ import DeleteIssueButton from './DeleteIssueButton';
 import { getServerSession } from 'next-auth';
 import authOptions from '@/app/auth/authOptions';
 import AssigneeSelect from './AssigneeSelect';
+import { Metadata } from 'next';
 
 interface IssueDetailPageProps {
   params: { id: string };
@@ -43,6 +44,13 @@ const IssueDetailPage: FC<IssueDetailPageProps> = async ({
       )}
     </Grid>
   );
+};
+
+
+export async  function generateMetadata ({params:{id}}:IssueDetailPageProps) {
+ const issue =  await prisma.issue.findUnique({where:{id: parseInt(id)}});
+
+ return {title:issue?.title, description:'Details of issue '+issue?.id}
 };
 
 export default IssueDetailPage;
